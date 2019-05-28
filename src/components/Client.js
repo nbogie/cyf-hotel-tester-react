@@ -69,16 +69,24 @@ class Client extends Component {
 function BookingList(props) {
   return (
     <section className="booking-list">
-      <ul>
-        {props.bookings.map(m => (
-          <Booking
-            key={m.id}
-            data={m}
-            onDeleteClicked={props.handleDeleteBooking}
-            onEditClicked={props.handleEditBooking}
-          />
-        ))}
-      </ul>
+      <table>
+        <thead>
+          <tr>
+            <th colspan="2">Latest Bookings</th>
+          </tr>
+        </thead>
+        <tbody>
+          {props.bookings.map(m => (
+            <Booking
+              key={m.id}
+              data={m}
+              onDeleteClicked={props.handleDeleteBooking}
+              onEditClicked={props.handleEditBooking}
+            />
+          ))}
+        </tbody>
+      </table>
+
       <button className="refresh" onClick={props.refreshList}>
         Refresh Bookings
       </button>
@@ -90,29 +98,25 @@ function Booking(props) {
     "|"
   );
   return (
-    <li className="booking-li">
-      <div className="booking-row">
-        {fieldNames.map(k => (
-          <span key={k} className={`booking-${k}`}>
-            {props.data[k]}
-          </span>
-        ))}
+    <tr className="booking-tr">
+      {fieldNames.map(k => (
+        <td key={k} className={`booking-${k}`}>
+          {props.data[k]}
+        </td>
+      ))}
 
-        <div className="controls">
-          <button onClick={event => props.onEditClicked(props.data)}>
-            EDIT
-          </button>
-          <div className="delete">
-            <button
-              className="btn btn-warning"
-              onClick={event => props.onDeleteClicked(props.data.id)}
-            >
-              X
-            </button>
-          </div>
-        </div>
-      </div>
-    </li>
+      <td className="edit">
+        <button onClick={event => props.onEditClicked(props.data)}>EDIT</button>
+      </td>
+      <td className="delete">
+        <button
+          className="btn btn-warning"
+          onClick={event => props.onDeleteClicked(props.data.id)}
+        >
+          X
+        </button>
+      </td>
+    </tr>
   );
 }
 
