@@ -105,9 +105,6 @@ function Booking(props) {
         </td>
       ))}
 
-      <td className="edit">
-        <button onClick={event => props.onEditClicked(props.data)}>EDIT</button>
-      </td>
       <td className="delete">
         <button
           className="btn btn-warning"
@@ -119,5 +116,17 @@ function Booking(props) {
     </tr>
   );
 }
+
+/*
+      <td className="edit">
+        <button
+          active="false"
+          onClick={event => props.onEditClicked(props.data)}
+        >
+          EDIT
+        </button>
+              </td>
+
+*/
 
 export default Client;
