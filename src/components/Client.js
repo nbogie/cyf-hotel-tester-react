@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Form from "./Form.js";
 import API from "./API.js";
 import APISelector from "./APISelector.js";
-import moment from "moment";
 
 class Client extends Component {
   state = {
@@ -10,7 +9,7 @@ class Client extends Component {
     settingsHidden: true,
     bookingBeingEdited: null
   };
-  api = new API("https://cyf-hotel-sample-soln.glitch.me");
+  api = new API("https://localhost:3001");
 
   handleChangedAPI = url => {
     this.api.setEndpoint(url);
