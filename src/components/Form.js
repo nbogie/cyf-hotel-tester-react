@@ -24,10 +24,10 @@ function randomDateStrings() {
   const dur = _.random(1, 14);
   const checkIn = moment()
     .dayOfYear(d1)
-    .format("DD/MM/YYYY");
+    .format("YYYY-MM-DD");
   const checkOut = moment()
     .dayOfYear(d1 + dur)
-    .format("DD/MM/YYYY");
+    .format("YYYY-MM-DD");
   return { checkIn, checkOut };
 }
 
