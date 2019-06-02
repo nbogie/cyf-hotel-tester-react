@@ -9,9 +9,20 @@ class API {
     console.log(`API endpoint now ${url}`);
     this.host = url;
   };
-  create = (resource, msg) =>
-    fetch(this.resolve(`/${resource}`), {
+  create = (resource, msg) => {
+    console.log(`POSTing ${resource}:`, msg);
+    return fetch(this.resolve(`/${resource}`), {
       method: "POST",
+      body: JSON.stringify(msg),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(res => res);
+  };
+
+  update = (resource, id, msg) =>
+    fetch(this.resolve(`/${resource}/${id}`), {
+      method: "PUT",
       body: JSON.stringify(msg),
       headers: {
         "Content-Type": "application/json"

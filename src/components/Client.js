@@ -3,11 +3,36 @@ import Form from "./Form.js";
 import API from "./API.js";
 import APISelector from "./APISelector.js";
 
+import randomNames from "random-name";
+import moment from "moment";
+import _ from "lodash";
+
+function randomDateStrings() {
+  const d1 = _.random(1, 364);
+  const dur = _.random(1, 14);
+  const checkIn = moment()
+    .dayOfYear(d1)
+    .format("YYYY-MM-DD");
+  const checkOut = moment()
+    .dayOfYear(d1 + dur)
+    .format("YYYY-MM-DD");
+  return { checkIn, checkOut };
+}
+const emptyBooking = {
+  title: "",
+  firstName: "",
+  surname: "",
+  roomId: "",
+  id: "",
+  email: "",
+  checkInDate: "",
+  checkOutDate: ""
+};
 class Client extends Component {
   state = {
     bookings: [],
     settingsHidden: true,
-    bookingBeingEdited: null
+    bookingBeingEdited: emptyBooking
   };
   api = new API("https://localhost:3001");
 
@@ -25,7 +50,38 @@ class Client extends Component {
   };
 
   handleEditBooking = booking => {
-    this.setState({ bookingBeingEdited: booking });
+    this.setState({ bookingBeingEdited: Object.assign({}, booking) });
+  };
+
+  clearBookingBeingEdited = () => {
+    this.setState({ bookingBeingEdited: Object.assign({}, emptyBooking) });
+  };
+
+  generateRandomBooking = () => {
+    const title = _.sample(["Mr", "Mrs", "Ms", "Sir"]);
+    const firstName = randomNames.first();
+    const surname = randomNames.last();
+    const email = firstName.toLowerCase() + "@example.com";
+    const roomId = _.random(1, 44);
+    const dates = randomDateStrings();
+    return {
+      checkInDate: dates.checkIn,
+      checkOutDate: dates.checkOut,
+      title,
+      firstName,
+      surname,
+      email,
+      roomId
+    };
+  };
+
+  handleSendRandom = event => {
+    const booking = this.generateRandomBooking();
+    console.log("sending random: ", { booking });
+    this.api.create("bookings", booking).then(json => {
+      this.refreshList();
+      this.clearBookingBeingEdited();
+    });
   };
 
   refreshList = () => {
@@ -40,6 +96,39 @@ class Client extends Component {
         settingsHidden: !p.settingsHidden
       };
     });
+
+  handleFormFieldChanged = event => {
+    const k = event.target.id;
+    const v = event.target.value;
+    this.setState(p => {
+      p.bookingBeingEdited[k] = v;
+      return p;
+    });
+  };
+
+  handleSendForm = () => {
+    console.log("state: ", this.state);
+    console.log("send.  booking is: ", this.state.bookingBeingEdited);
+    const id = parseInt(this.state.bookingBeingEdited.id);
+    //TODO: do this right
+    if (isNaN(id)) {
+      this.api.create("bookings", this.state.bookingBeingEdited).then(res => {
+        this.refreshList();
+        this.clearBookingBeingEdited();
+      });
+    } else {
+      this.api
+        .update(
+          "bookings",
+          this.state.bookingBeingEdited.id,
+          this.state.bookingBeingEdited
+        )
+        .then(res => {
+          this.refreshList();
+          this.clearBookingBeingEdited();
+        });
+    }
+  };
 
   render() {
     return (
@@ -59,7 +148,9 @@ class Client extends Component {
         <Form
           api={this.api}
           bookingBeingEdited={this.state.bookingBeingEdited}
-          callAfterSend={this.refreshList}
+          handleChange={this.handleFormFieldChanged}
+          handleSend={this.handleSendForm}
+          handleSendRandom={this.handleSendRandom}
         />
       </section>
     );
@@ -72,7 +163,7 @@ function BookingList(props) {
       <table>
         <thead>
           <tr>
-            <th colspan="2">Latest Bookings</th>
+            <th colSpan="2">Latest Bookings</th>
           </tr>
         </thead>
         <tbody>
@@ -105,6 +196,15 @@ function Booking(props) {
         </td>
       ))}
 
+      <td className="edit">
+        <button
+          active="false"
+          onClick={event => props.onEditClicked(props.data)}
+        >
+          EDIT
+        </button>
+      </td>
+
       <td className="delete">
         <button
           className="btn btn-warning"
@@ -116,17 +216,5 @@ function Booking(props) {
     </tr>
   );
 }
-
-/*
-      <td className="edit">
-        <button
-          active="false"
-          onClick={event => props.onEditClicked(props.data)}
-        >
-          EDIT
-        </button>
-              </td>
-
-*/
 
 export default Client;
